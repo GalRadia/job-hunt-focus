@@ -1,0 +1,16 @@
+{
+  "name": "job-hunt-focus",
+  "version": "0.1.0",
+  "description": "Chrome extension: focus blocker, todo list, tab sessions and daily goals for job hunting",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc --watch",
+    "test": "tsc && node --test"
+  },
+  "devDependencies": {
+    "@types/chrome": "^0.3.7",
+    "typescript": "^7.0.2"
+  }
+}

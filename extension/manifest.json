@@ -1,0 +1,13 @@
+{
+  "manifest_version": 3,
+  "name": "Job Hunt Focus",
+  "version": "0.1.0",
+  "description": "Stay focused while job hunting: site blocker, Pomodoro timer, todo list with daily goals, and tab sessions.",
+  "icons": { "128": "icon.png" },
+  "action": { "default_popup": "popup.html", "default_icon": "icon.png" },
+  "options_page": "options.html",
+  "background": { "service_worker": "js/background.js", "type": "module" },
+  "permissions": ["storage", "tabs", "alarms", "declarativeNetRequest", "contextMenus", "notifications"],
+  "host_permissions": ["<all_urls>"],
+  "web_accessible_resources": [{ "resources": ["blocked.html"], "matches": ["<all_urls>"] }]
+}

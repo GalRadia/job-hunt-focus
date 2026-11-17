@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Job Hunt Focus Settings</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <form id="form" class="page">
+    <h1>Job Hunt Focus Settings</h1>
+    <label>Blocked sites (blocklist mode), one per line
+      <textarea id="blocklist"></textarea>
+    </label>
+    <label>Allowed sites (allowlist mode), one per line. Subdomains are included.
+      <textarea id="allowlist"></textarea>
+    </label>
+    <div class="row">
+      <label>Focus (min) <input id="focusMin" type="number" min="1"></label>
+      <label>Break (min) <input id="breakMin" type="number" min="1"></label>
+      <label>Daily goal <input id="dailyGoal" type="number" min="1"></label>
+    </div>
+    <div class="row">
+      <button class="primary">Save</button>
+      <span id="saved" class="muted" hidden>Saved ✓</span>
+    </div>
+  </form>
+  <script type="module" src="js/options.js"></script>
+</body>
+</html>

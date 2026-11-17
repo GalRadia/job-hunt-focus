@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Job Hunt Focus</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="popup">
+  <nav>
+    <button data-tab="focus" class="active">Focus</button>
+    <button data-tab="todos">Todos</button>
+    <button data-tab="sessions">Sessions</button>
+  </nav>
+  <main>
+    <section id="focus">
+      <div id="status"></div>
+      <div class="row">
+        <button id="start" class="primary">Start focus session</button>
+        <button id="stop" hidden>Stop</button>
+      </div>
+      <label class="row">Block mode
+        <select id="mode">
+          <option value="blocklist">Block distracting sites</option>
+          <option value="allowlist">Allow only job-search sites</option>
+        </select>
+      </label>
+      <p class="muted">Sites are blocked only during focus sessions.</p>
+      <button id="options">Edit site lists, durations &amp; goal</button>
+    </section>
+
+    <section id="todos" hidden>
+      <div id="goal"></div>
+      <form id="todo-form" class="row">
+        <input id="todo-text" type="text" placeholder="Add a todo…" aria-label="New todo">
+        <button>Add</button>
+      </form>
+      <div class="row">
+        <button id="save-job">+ Save this tab as job to apply</button>
+        <button id="clear-done">Clear done</button>
+      </div>
+      <ul id="todo-list" class="list"></ul>
+    </section>
+
+    <section id="sessions" hidden>
+      <form id="session-form" class="row">
+        <input id="session-name" type="text" placeholder="Session name" aria-label="Session name">
+        <button class="primary">Save window</button>
+      </form>
+      <ul id="session-list" class="list"></ul>
+    </section>
+  </main>
+  <script type="module" src="js/popup.js"></script>
+</body>
+</html>
