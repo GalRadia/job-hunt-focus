@@ -28,6 +28,10 @@ jobs:
       - run: npm test
       # End-to-end: the real extension in Chrome for Testing, against a local fake internet
       - run: npm run e2e:setup
+      # Ubuntu 23.10+ (ubuntu-latest) blocks unprivileged user namespaces via AppArmor, which Chrome's sandbox
+      # needs ("No usable sandbox!"). Lift that restriction on this throwaway runner instead of using --no-sandbox,
+      # so the tests still run with Chrome's sandbox on.
+      - run: sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
       - run: npm run test:e2e
       # Ready-to-upload Chrome Web Store package (extension/ incl. compiled js/)
       - run: cd extension && zip -qr ../job-hunt-focus.zip .
