@@ -24,6 +24,8 @@ const stub = `
       { id: '3', text: 'Apply: Full Stack Developer at Check Point', url: 'https://indeed.com/2', done: true, doneAt: Date.now() },
       { id: '4', text: 'Update portfolio README with the extension GIF', done: true, doneAt: Date.now() },
       { id: '5', text: 'Apply: React Developer at Fiverr', url: 'https://fiverr.com/careers', done: true, doneAt: Date.now() },
+      { id: '6', text: 'Practice React performance questions', done: false, positionId: '1' },
+      { id: '7', text: 'Review system design basics', done: true, doneAt: Date.now(), positionId: '1' },
     ],
     sessions: [
       { id: 'a', name: 'Morning applications', urls: Array(7).fill('https://linkedin.com'), savedAt: Date.now() },
@@ -39,7 +41,8 @@ const stub = `
         pos('2', 'Lemonade', 'Product Engineer', 'closed', { url: 'https://boards.greenhouse.io/lemonade/1', appliedOn: '2026-10-28', lastChecked: now - h, signals: [sig('page', 'Posting closed', h, true)] }),
         pos('3', 'Monday.com', 'Full Stack Developer', 'applied', { url: 'https://monday.com/careers/3', appliedOn: '2026-11-10', lastChecked: now - 2 * h }),
         pos('4', 'Fiverr', 'React Developer', 'applied', { url: 'https://www.linkedin.com/jobs/view/4', appliedOn: '2026-11-12', checkError: 'The page returned HTTP 999' }),
-        pos('5', 'Check Point', 'Software Engineer, Web', 'rejected', { appliedOn: '2026-10-20', signals: [sig('import', 'Imported as Rejected', 30 * h)] }),
+        pos('5', 'Check Point', 'Software Engineer, Web', 'rejected', { appliedOn: '2026-10-20', signals: [sig('import', 'Imported as Rejected', 30 * h)],
+          reflection: 'Got to the technical round. I rushed the system design question and skipped clarifying requirements.\\nNext time: ask about scale and constraints first, and practice two design problems out loud before the interview.' }),
         pos('6', 'Riskified', 'Frontend Team Lead', 'offer', { appliedOn: '2026-10-15', signals: [sig('manual', 'Moved to Offer', 20 * h, true)] }),
         pos('7', 'Similarweb', 'Frontend Engineer', 'saved', { url: 'https://www.similarweb.com/corp/careers/7' }),
       ];

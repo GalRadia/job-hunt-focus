@@ -30,13 +30,14 @@ export function parseCsv(text: string): string[][] {
   return rows.filter((r) => r.some((f) => f.trim()));
 }
 
-type Field = 'url' | 'company' | 'status' | 'appliedOn' | 'notes' | 'title';
+type Field = 'url' | 'company' | 'status' | 'appliedOn' | 'reflection' | 'notes' | 'title';
 // Order matters: "Job link" must become url before "job" can claim it as the title.
 const ALIASES: [Field, string[]][] = [
   ['url', ['url', 'link', 'קישור', 'לינק']],
   ['company', ['company', 'employer', 'organization', 'חברה']],
   ['status', ['status', 'stage', 'state', 'סטטוס', 'מצב']],
   ['appliedOn', ['date', 'applied', 'תאריך']],
+  ['reflection', ['reflection', 'lesson', 'תובנ', 'לקח']],
   ['notes', ['note', 'comment', 'הערות', 'הערה']],
   ['title', ['title', 'position', 'role', 'job', 'תפקיד', 'משרה']],
 ];
@@ -74,10 +75,11 @@ export function importRows(rows: string[][], existing: Position[]): ImportResult
     // An empty status on a dated row means it came from an application log.
     const status = statusFromText(cell('status')) ?? (appliedOn ? 'applied' : 'saved');
     const notes = cell('notes') || undefined;
+    const reflection = cell('reflection') || undefined;
 
     const found = next.find((p) => (url && p.url === url) || key(p) === key({ company, title }));
     if (!found) {
-      next.push(newPosition({ company, title, url, status, appliedOn, notes, signals: [newSignal('import', `Imported as ${STATUS_LABEL[status]}`)] }));
+      next.push(newPosition({ company, title, url, status, appliedOn, notes, reflection, signals: [newSignal('import', `Imported as ${STATUS_LABEL[status]}`)] }));
       res.added++;
       continue;
     }
@@ -88,6 +90,7 @@ export function importRows(rows: string[][], existing: Position[]): ImportResult
     if (url && url !== found.url) patch.url = url;
     if (appliedOn && appliedOn !== found.appliedOn) patch.appliedOn = appliedOn;
     if (notes && notes !== found.notes) patch.notes = notes;
+    if (reflection && reflection !== found.reflection) patch.reflection = reflection;
     if (cell('status') && status !== found.status) patch.status = status;
     if (!Object.keys(patch).length) continue;
     Object.assign(found, patch, { updatedAt: Date.now() });
@@ -105,7 +108,7 @@ function csvCell(v: string | undefined): string {
 }
 
 export function toCsv(positions: Position[]): string {
-  const rows = [['Company', 'Title', 'Status', 'Applied on', 'URL', 'Notes']];
-  for (const p of positions) rows.push([p.company, p.title, STATUS_LABEL[p.status], p.appliedOn ?? '', p.url ?? '', p.notes ?? '']);
+  const rows = [['Company', 'Title', 'Status', 'Applied on', 'URL', 'Notes', 'Reflection']];
+  for (const p of positions) rows.push([p.company, p.title, STATUS_LABEL[p.status], p.appliedOn ?? '', p.url ?? '', p.notes ?? '', p.reflection ?? '']);
   return '﻿' + rows.map((r) => r.map(csvCell).join(',')).join('\r\n'); // BOM so Excel reads UTF-8 (Hebrew) correctly
 }

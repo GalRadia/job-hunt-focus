@@ -9,7 +9,7 @@ Job Hunt Focus does not collect, transmit, sell or share any personal data.
 Everything the extension saves stays in your browser's local extension storage (`chrome.storage.local`) on your own device:
 
 - your to-do items
-- the positions in your application tracker: company, role, status, posting address, dates and notes, whether you saved them from a page, added them by hand or imported them from a CSV file
+- the positions in your application tracker: company, role, status, posting address, dates, notes and your reflections on rejections, whether you saved them from a page, added them by hand or imported them from a CSV file
 - saved tab sessions (the addresses of tabs in a window you choose to save)
 - your settings: site lists, timer durations, daily goal and posting-check interval
 - a count of completed to-dos and applications per day, used for the daily goal and streak

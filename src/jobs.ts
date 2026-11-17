@@ -73,6 +73,45 @@ export function htmlToLines(html: string): string[] {
   return out;
 }
 
+// [pattern, suggestion]. Boundaries use lookarounds because \b doesn't work next to "#", "+" or ".".
+const SKILLS: [RegExp, string][] = [
+  [/python|django|flask|fastapi/i, 'Learn Python'],
+  [/(?<![\w.])java(?![\w#+])(?!script)/i, 'Learn Java'],
+  [/typescript|(?<![\w.])ts(?!\w)/i, 'Learn TypeScript'],
+  [/javascript|(?<![\w.])js(?!\w)/i, 'Practice JavaScript'],
+  [/react(?!ive)/i, 'Practice React'],
+  [/angular/i, 'Practice Angular'],
+  [/(?<!\w)vue/i, 'Practice Vue'],
+  [/node(\.js|js)?(?!\w)/i, 'Practice Node.js'],
+  [/(?<![\w.])(go|golang)(?![\w#+])/i, 'Learn Go'],
+  [/c#|\.net|dotnet/i, 'Learn C# and .NET'],
+  [/c\+\+/i, 'Practice C++'],
+  [/(?<![\w.])rust(?!\w)/i, 'Learn Rust'],
+  [/kotlin|android/i, 'Learn Kotlin and Android'],
+  [/swift|(?<!\w)ios(?!\w)/i, 'Learn Swift and iOS'],
+  [/sql|postgres|mysql|database/i, 'Practice SQL'],
+  [/(?<!\w)aws(?!\w)/i, 'Learn AWS basics'],
+  [/azure/i, 'Learn Azure basics'],
+  [/(?<!\w)gcp(?!\w)|google cloud/i, 'Learn Google Cloud basics'],
+  [/docker|container/i, 'Practice Docker'],
+  [/kubernetes|(?<!\w)k8s(?!\w)/i, 'Learn Kubernetes'],
+  [/linux/i, 'Practice Linux'],
+  [/devops|(?<!\w)sre(?!\w)|ci\/cd/i, 'Practice CI/CD'],
+  [/machine learning|(?<!\w)ml(?!\w)|(?<!\w)ai(?!\w)|deep learning/i, 'Review machine learning basics'],
+  [/data (scien|analy|engineer)|analyst/i, 'Practice data analysis'],
+  [/(?<!\w)qa(?!\w)|(?<!\w)test(ing|er)?(?!\w)|automation/i, 'Practice test automation'],
+  [/figma|(?<!\w)ux(?!\w)|ui designer|product designer/i, 'Polish your design portfolio'],
+  [/product manager|(?<!\w)pm(?!\w)/i, 'Prepare product case studies'],
+  [/frontend|front-end|front end/i, 'Practice frontend interview questions'],
+  [/backend|back-end|back end/i, 'Practice system design'],
+  [/full ?stack|full-stack/i, 'Build a small full-stack project'],
+];
+
+/** Learning todos suggested by a role title, e.g. "Python Developer" -> ["Learn Python"]. Max 3. */
+export function skillTodos(title: string): string[] {
+  return [...new Set(SKILLS.filter(([r]) => r.test(title)).map(([, s]) => s))].slice(0, 3);
+}
+
 const STATUS_WORDS: [Status, RegExp][] = [
   ['offer', /offer|הצעה/i],
   ['rejected', /reject|declin|turned down|not (selected|moving)|^no$|נדח|דחי|לא התקבל/i],

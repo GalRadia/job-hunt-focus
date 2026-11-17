@@ -22,10 +22,21 @@ function bumpToday(history: Store['history'], delta: number) {
   history[today] = Math.max(0, (history[today] ?? 0) + delta);
 }
 
-export async function addTodo(text: string, url?: string): Promise<void> {
+export async function addTodo(text: string, url?: string, positionId?: string): Promise<void> {
   const todos = await get('todos');
-  todos.unshift({ id: crypto.randomUUID(), text, url, done: false });
+  todos.unshift({ id: crypto.randomUUID(), text, url, done: false, positionId });
   await set('todos', todos);
+}
+
+export async function removeTodo(id: string): Promise<void> {
+  await set('todos', (await get('todos')).filter((t) => t.id !== id));
+}
+
+/** Removes a position. Its linked todos stay (e.g. "Learn Python" is still worth doing), just unlinked. */
+export async function deletePosition(id: string): Promise<void> {
+  const [positions, todos] = await Promise.all([get('positions'), get('todos')]);
+  for (const t of todos) if (t.positionId === id) delete t.positionId;
+  await chrome.storage.local.set({ positions: positions.filter((p) => p.id !== id), todos });
 }
 
 export async function toggleTodo(id: string): Promise<void> {
@@ -58,14 +69,16 @@ export async function addJobFromTab(tab: chrome.tabs.Tab): Promise<boolean> {
   return addPosition(newPosition({ title: title || 'Untitled job', company, url: safeUrl(tab.url) }));
 }
 
-/** Patches a position. Moving to Applied counts toward today's goal. */
+/** Patches a position. Moving to Applied counts toward today's goal. Only status changes bump updatedAt
+ *  (the table's sort key), so editing notes or names doesn't make the row jump. */
 export async function updatePosition(id: string, patch: Partial<Position>, signal?: Signal): Promise<void> {
   const [positions, history] = await Promise.all([get('positions'), get('history')]);
   const p = positions.find((x) => x.id === id);
   if (!p) return;
   // shortcut: moving away from Applied doesn't un-count it; fine for a daily nudge, revisit if goals get stricter
   if (patch.status === 'applied' && p.status !== 'applied') bumpToday(history, 1);
-  Object.assign(p, patch, { updatedAt: Date.now() });
+  if (patch.status && patch.status !== p.status) p.updatedAt = Date.now();
+  Object.assign(p, patch);
   if (signal) p.signals = [signal, ...p.signals].slice(0, 10);
   await chrome.storage.local.set({ positions, history });
 }

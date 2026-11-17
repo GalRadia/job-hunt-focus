@@ -23,7 +23,7 @@ const shots = {
     text: 'Save any posting in one click. Watched postings are checked in the background, and your daily goal counts every application.',
   }),
   '3-blocked.png': `${base}/blocked.html?focus`,
-  '2-tracker.png': `${base}/tracker.html`,
+  '2-tracker.png': `${base}/tracker.html?open=5`,
   '4-sessions.png': frame({
     page: 'popup.html', tab: 'sessions',
     title: 'Pick up exactly where you left off',

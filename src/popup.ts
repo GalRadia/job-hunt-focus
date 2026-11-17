@@ -1,4 +1,4 @@
-import { get, set, addTodo, addJobFromTab, toggleTodo, markSeen } from './storage.js';
+import { get, set, addTodo, addJobFromTab, toggleTodo, markSeen, removeTodo } from './storage.js';
 import { el, $, formatClock, renderGoal } from './dom.js';
 import { STATUSES, STATUS_LABEL, type Mode, type Todo, type Session, type Timer, type Settings } from './types.js';
 
@@ -46,22 +46,27 @@ $('options').onclick = () => chrome.runtime.openOptionsPage();
 
 // ---- todos ----
 async function renderTodos() {
-  const [todos, history, s] = await Promise.all([get('todos'), get('history'), get('settings')]);
+  const [todos, history, s, positions] = await Promise.all([get('todos'), get('history'), get('settings'), get('positions')]);
   renderGoal(history, s.dailyGoal);
+  const byId = new Map(positions.map((p) => [p.id, p]));
   const open = todos.filter((t) => !t.done).length;
   $('todo-count').textContent = open ? String(open) : '';
   $('todo-empty').hidden = todos.length > 0;
   $('clear-done').hidden = open === todos.length;
   $('todo-list').replaceChildren(
-    ...todos.map((t: Todo) =>
-      el('li', { className: t.done ? 'done' : '' },
+    ...todos.map((t: Todo) => {
+      const p = t.positionId ? byId.get(t.positionId) : undefined;
+      const forText = p && `for ${p.title}${p.company ? ` at ${p.company}` : ''}`;
+      return el('li', { className: t.done ? 'done' : '' },
         el('input', { type: 'checkbox', className: 'check', checked: t.done, ariaLabel: t.text, onchange: () => toggleTodo(t.id) }),
-        t.url
-          ? el('a', { href: t.url, target: '_blank', textContent: t.text, title: t.text, className: 'item-text' })
-          : el('span', { textContent: t.text, title: t.text, className: 'item-text' }),
-        el('button', { className: 'del', ariaLabel: `Delete ${t.text}`, textContent: '×', onclick: () => set('todos', todos.filter((x) => x.id !== t.id)) }),
-      ),
-    ),
+        el('div', { className: 'item-stack' },
+          t.url
+            ? el('a', { href: t.url, target: '_blank', textContent: t.text, title: t.text, className: 'item-text' })
+            : el('span', { textContent: t.text, title: t.text, className: 'item-text' }),
+          forText ? el('a', { className: 'todo-link', href: trackerUrl(`?open=${encodeURIComponent(p.id)}`), target: '_blank', textContent: forText, title: forText }) : ''),
+        el('button', { className: 'del', ariaLabel: `Delete ${t.text}`, textContent: '×', onclick: () => removeTodo(t.id) }),
+      );
+    }),
   );
 }
 

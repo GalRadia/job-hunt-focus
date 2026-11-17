@@ -58,6 +58,16 @@ test('importRows: no company/title columns -> everything skipped', () => {
   assert.deepEqual([r.added, r.updated, r.skipped], [0, 0, 2]);
 });
 
+test('reflection column: imported by English or Hebrew alias, exported, and re-imported', () => {
+  assert.equal(mapHeader(['Company', 'Title', 'לקחים']).reflection, 2);
+  assert.equal(mapHeader(['Company', 'Title', 'Lessons learned']).reflection, 2);
+  const { next } = importRows(parseCsv('Company,Title,Status,Reflection\nCheck Point,Web Engineer,Rejected,"Practice system design, slow down"'), []);
+  assert.equal(next[0].reflection, 'Practice system design, slow down');
+  const back = importRows(parseCsv(toCsv(next)), []).next;
+  assert.equal(back[0].reflection, 'Practice system design, slow down');
+  assert.equal(back[0].status, 'rejected');
+});
+
 test('toCsv: round-trips and defuses formulas', () => {
   const { next } = importRows(parseCsv('Company,Title,URL\n"=HYPERLINK(""x"")","A, B",https://x.com/1'), []);
   const out = toCsv(next);

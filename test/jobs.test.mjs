@@ -1,6 +1,23 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { parseJobTitle, isClosed, htmlToLines, statusFromText, safeUrl } from '../extension/js/jobs.js';
+import { parseJobTitle, isClosed, htmlToLines, statusFromText, safeUrl, skillTodos } from '../extension/js/jobs.js';
+
+test('skillTodos: suggests learning todos from the role title', () => {
+  assert.deepEqual(skillTodos('Python Developer'), ['Learn Python']);
+  assert.deepEqual(skillTodos('Senior Backend Engineer (Node.js, AWS)'), ['Practice Node.js', 'Learn AWS basics', 'Practice system design']);
+  assert.equal(skillTodos('Full Stack Developer: React, TypeScript, Python, SQL').length, 3);
+});
+
+test('skillTodos: word boundaries avoid false matches', () => {
+  assert.deepEqual(skillTodos('JavaScript Engineer'), ['Practice JavaScript']); // not Java
+  assert.deepEqual(skillTodos('Java Developer'), ['Learn Java']);
+  assert.deepEqual(skillTodos('Google Ads Specialist'), []); // not Go
+  assert.deepEqual(skillTodos('Go Engineer'), ['Learn Go']);
+  assert.deepEqual(skillTodos('Linux Support'), ['Practice Linux']); // not UX
+  assert.deepEqual(skillTodos('Latest Opportunities at Studios'), []); // not test, not iOS
+  assert.deepEqual(skillTodos('C# .NET Developer'), ['Learn C# and .NET']);
+  assert.deepEqual(skillTodos('Office Manager'), []);
+});
 
 test('parseJobTitle: pipe-separated with site suffix', () => {
   assert.deepEqual(parseJobTitle('(3) Senior Frontend Engineer | Wix | LinkedIn'), { title: 'Senior Frontend Engineer', company: 'Wix' });

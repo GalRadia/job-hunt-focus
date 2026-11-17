@@ -11,6 +11,12 @@ A Chrome extension that keeps you focused while job hunting. It blocks distracti
 - **Application tracker.** A full-page table of every position, with the status pipeline Saved → Applied → Interview → Offer / Rejected / Closed.
   - **Save a job in one click.** Use the popup or the right-click menu on any posting. The tab title is parsed into a role and a company, which you can edit in the table.
   - **Import your existing spreadsheet.** Save it as CSV from Excel or Google Sheets. Columns are matched by name in English or Hebrew (e.g. Company, Job Title, Status, Link, Date). Free-text statuses like "Phone screen" or "נדחה" are recognized. Re-importing updates rows instead of duplicating them. See [docs/sample-positions.csv](docs/sample-positions.csv).
+  - **Notes, reflections and linked todos.** Expand any row to:
+    - write notes
+    - add todos linked to that position. A role's skills prompt suggestions, so a "Python Developer" posting suggests *Learn Python*.
+    - write a reflection when a position is rejected, answering "what would I do better next time?". Moving a row to Rejected opens this box for you.
+  - **Lessons from rejections.** Every reflection is collected below the table, so you can spot patterns across rejections.
+  - **Linked todos in the popup** show which position they belong to and open it in the tracker.
   - **Export to CSV** for backup. Exports are Excel-safe and keep Hebrew text intact.
   - **Closed-posting detection.** Postings you watch are re-checked in the background (every 3 hours by default). A posting that's taken down is marked Closed and you get a notification.
 - **Todo list** for everything else on your plate.

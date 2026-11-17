@@ -18,6 +18,9 @@ export interface Position {
   /** kept as written in the imported sheet */
   appliedOn?: string;
   notes?: string;
+  /** "What would I do better next time?" — written when a position is Rejected */
+  reflection?: string;
+  /** bumped only by status changes, so editing text doesn't reorder the table */
   updatedAt: number;
   /** check the posting page in the background */
   watch: boolean;
@@ -27,7 +30,7 @@ export interface Position {
   signals: Signal[];
 }
 
-export interface Todo { id: string; text: string; url?: string; done: boolean; doneAt?: number }
+export interface Todo { id: string; text: string; url?: string; done: boolean; doneAt?: number; positionId?: string }
 export interface Session { id: string; name: string; urls: string[]; savedAt: number }
 export interface Timer { phase: Phase; endsAt: number }
 export interface Settings {
