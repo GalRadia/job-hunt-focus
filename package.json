@@ -2,6 +2,7 @@
   "name": "job-hunt-focus",
   "version": "0.1.0",
   "description": "Chrome extension: focus blocker, todo list, tab sessions and daily goals for job hunting",
+  "license": "MIT",
   "type": "module",
   "private": true,
   "scripts": {

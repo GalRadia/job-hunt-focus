@@ -75,3 +75,7 @@ Compress-Archive -Path extension\* -DestinationPath job-hunt-focus.zip -Force
 ```
 
 Store screenshots and the promo tile are in `store/screenshots/`. Regenerate them with `npm run preview` plus `node tools/screenshots.mjs`. The privacy policy is [PRIVACY.md](PRIVACY.md).
+
+## License
+
+[MIT](LICENSE)
