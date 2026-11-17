@@ -2,17 +2,24 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>Stay focused</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Back to the job hunt</title>
   <link rel="stylesheet" href="styles.css">
 </head>
-<body>
-  <div class="page blocked">
+<body class="blocked-page">
+  <main class="blocked">
     <h1 id="line"></h1>
-    <p id="left" class="muted"></p>
-    <p id="goal"></p>
+    <p id="left" class="left"></p>
+    <div class="goal-card">
+      <div class="today-row">
+        <p><strong id="goal-count">0 of 5</strong> done today</p>
+        <div id="pips" class="pips" role="img"></div>
+      </div>
+      <p id="streak" class="muted small"></p>
+    </div>
     <h2>Next up</h2>
     <ul id="todos"></ul>
-  </div>
+  </main>
   <script type="module" src="js/blocked.js"></script>
 </body>
 </html>

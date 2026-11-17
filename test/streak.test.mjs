@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { dayKey, streak, goalText } from '../extension/js/streak.js';
+import { dayKey, streak, goalSummary } from '../extension/js/streak.js';
 
 const today = new Date(2026, 10, 17); // Nov 17 2026, local time
 const h = (counts) => Object.fromEntries(counts.map(([day, n]) => [dayKey(new Date(2026, 10, day)), n]));
@@ -30,7 +30,8 @@ test('goal < 1 returns 0 instead of looping forever', () => {
   assert.equal(streak({}, 0, today), 0);
 });
 
-test('goalText', () => {
-  assert.equal(goalText(h([[17, 3]]), 5, today), '3/5 done today');
-  assert.equal(goalText(h([[17, 5], [16, 5]]), 5, today), '5/5 done today · 🔥 2-day streak');
+test('goalSummary', () => {
+  assert.deepEqual(goalSummary(h([[17, 3]]), 5, today), { done: 3, goal: 5, streak: 0, streakText: 'Hit your goal today to start a streak' });
+  assert.equal(goalSummary(h([[17, 5], [16, 5]]), 5, today).streakText, '2-day streak, goal met today');
+  assert.equal(goalSummary(h([[17, 1], [16, 5]]), 5, today).streakText, '1-day streak, keep it going today');
 });

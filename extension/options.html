@@ -2,26 +2,30 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Job Hunt Focus Settings</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <form id="form" class="page">
-    <h1>Job Hunt Focus Settings</h1>
-    <label>Blocked sites (blocklist mode), one per line
-      <textarea id="blocklist"></textarea>
+    <h1>Settings</h1>
+    <p class="lede">Sites are only blocked while a focus session is running.</p>
+    <label class="field"><span>Distracting sites</span>
+      <small>Blocked in “Block distractions” mode. One site per line.</small>
+      <textarea id="blocklist" spellcheck="false"></textarea>
     </label>
-    <label>Allowed sites (allowlist mode), one per line. Subdomains are included.
-      <textarea id="allowlist"></textarea>
+    <label class="field"><span>Job-search sites</span>
+      <small>The only sites allowed in “Job sites only” mode. Subdomains are included.</small>
+      <textarea id="allowlist" spellcheck="false"></textarea>
     </label>
-    <div class="row">
-      <label>Focus (min) <input id="focusMin" type="number" min="1"></label>
-      <label>Break (min) <input id="breakMin" type="number" min="1"></label>
-      <label>Daily goal <input id="dailyGoal" type="number" min="1"></label>
+    <div class="numbers">
+      <label class="field"><span>Focus minutes</span><input id="focusMin" type="number" min="1"></label>
+      <label class="field"><span>Break minutes</span><input id="breakMin" type="number" min="1"></label>
+      <label class="field"><span>Daily goal</span><input id="dailyGoal" type="number" min="1"></label>
     </div>
-    <div class="row">
-      <button class="primary">Save</button>
-      <span id="saved" class="muted" hidden>Saved ✓</span>
+    <div class="actions">
+      <button class="primary">Save settings</button>
+      <span id="saved" class="muted" role="status" hidden>Settings saved</span>
     </div>
   </form>
   <script type="module" src="js/options.js"></script>

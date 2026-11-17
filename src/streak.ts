@@ -17,7 +17,11 @@ export function streak(history: Record<string, number>, goal: number, today: Dat
   return n;
 }
 
-export function goalText(history: Record<string, number>, goal: number, today = new Date()): string {
+export interface GoalSummary { done: number; goal: number; streak: number; streakText: string }
+
+export function goalSummary(history: Record<string, number>, goal: number, today = new Date()): GoalSummary {
+  const done = history[dayKey(today)] ?? 0;
   const s = streak(history, goal, today);
-  return `${history[dayKey(today)] ?? 0}/${goal} done today` + (s ? ` · 🔥 ${s}-day streak` : '');
+  const streakText = s ? `${s}-day streak${done >= goal ? ', goal met today' : ', keep it going today'}` : 'Hit your goal today to start a streak';
+  return { done, goal, streak: s, streakText };
 }
