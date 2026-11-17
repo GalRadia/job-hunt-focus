@@ -7,7 +7,8 @@
   "scripts": {
     "build": "tsc",
     "watch": "tsc --watch",
-    "test": "tsc && node --test"
+    "test": "tsc && node --test",
+    "preview": "tsc && node tools/preview.mjs"
   },
   "devDependencies": {
     "@types/chrome": "^0.3.7",

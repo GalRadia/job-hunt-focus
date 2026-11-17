@@ -1,0 +1,45 @@
+<!doctype html>
+<!-- 1280x800 Chrome Web Store screenshot frame. Served by `npm run preview`.
+     /store/frame.html?page=popup.html%3Ffocus&tab=sessions&title=...&text=... -->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Store frame</title>
+  <link rel="stylesheet" href="/styles.css">
+  <style>
+    html, body { width: 1280px; height: 800px; overflow: hidden; }
+    body { display: grid; grid-template-columns: 1fr 380px; align-items: center; gap: 80px; padding: 0 120px 0 112px; background: var(--paper); }
+    html.fit, html.fit body { width: 100vw; height: 100vh; } /* ?fit: fill any viewport (used for the README GIF) */
+    html.fit body { padding: 0 max(48px, calc((100vw - 1100px) / 2)); }
+    body[data-tone=focus] { background: var(--evergreen); color: var(--on-color); }
+    h1 { margin: 0 0 18px; font-size: 64px; font-weight: 720; line-height: 1.02; letter-spacing: -.04em; }
+    p { font-size: 22px; line-height: 1.45; max-width: 30ch; opacity: .78; }
+    .brand { display: flex; align-items: center; gap: 10px; margin-bottom: 44px; font-weight: 650; font-size: 18px; }
+    .brand img { width: 30px; height: 30px; }
+    iframe { width: 360px; height: 640px; border: 0; border-radius: 16px; background: var(--surface);
+             box-shadow: 0 0 0 1px rgb(0 0 0 / .08), 0 30px 60px -20px rgb(20 40 30 / .35); }
+  </style>
+</head>
+<body>
+  <div>
+    <div class="brand"><img src="/icon.png" alt="">Job Hunt Focus</div>
+    <h1 id="title"></h1>
+    <p id="text"></p>
+  </div>
+  <iframe id="popup" title="Extension popup" scrolling="no"></iframe>
+  <script>
+    const q = new URLSearchParams(location.search);
+    document.getElementById('title').textContent = q.get('title') || 'Stay on task while you job hunt';
+    document.getElementById('text').textContent = q.get('text') || '';
+    if (q.get('tone')) document.body.dataset.tone = q.get('tone');
+    if (q.has('fit')) document.documentElement.classList.add('fit');
+    const f = document.getElementById('popup');
+    f.src = '/' + (q.get('page') || 'popup.html');
+    f.onload = () => setTimeout(() => {
+      const doc = f.contentDocument;
+      if (q.get('tab')) doc.querySelector(`[data-tab="${q.get('tab')}"]`)?.click();
+      f.style.height = Math.min(640, doc.body.offsetHeight) + 'px'; // hug the popup like Chrome does
+    }, 300);
+  </script>
+</body>
+</html>
