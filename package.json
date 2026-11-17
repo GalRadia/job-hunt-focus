@@ -8,10 +8,13 @@
     "build": "tsc",
     "watch": "tsc --watch",
     "test": "tsc && node --test",
-    "preview": "tsc && node tools/preview.mjs"
+    "preview": "tsc && node tools/preview.mjs",
+    "e2e:setup": "npx -y @puppeteer/browsers install chrome@stable --path .cache/browsers",
+    "test:e2e": "tsc && node --test --test-concurrency=1 e2e/*.e2e.mjs"
   },
   "devDependencies": {
     "@types/chrome": "^0.3.7",
+    "puppeteer-core": "^25.18.0",
     "typescript": "^7.0.2"
   }
 }

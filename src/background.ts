@@ -1,7 +1,7 @@
 import { get, set, addJobFromTab, markSeen } from './storage.js';
 import { buildRules, RULE_ID } from './rules.js';
 import { minutesLeft } from './dom.js';
-import { htmlToLines, isClosed, newSignal } from './jobs.js';
+import { htmlToLines, isClosed, isPublicWebUrl, newSignal, MAX_HTML } from './jobs.js';
 import type { Phase, Timer } from './types.js';
 
 const IDLE: Timer = { phase: 'idle', endsAt: 0 };
@@ -11,7 +11,13 @@ const IDLE: Timer = { phase: 'idle', endsAt: 0 };
 async function applyBlocking(on: boolean) {
   const s = await get('settings');
   const addRules = on ? buildRules(s.mode, s.mode === 'blocklist' ? s.blocklist : s.allowlist) : [];
-  await chrome.declarativeNetRequest.updateDynamicRules({ removeRuleIds: [RULE_ID], addRules });
+  try {
+    await chrome.declarativeNetRequest.updateDynamicRules({ removeRuleIds: [RULE_ID], addRules });
+  } catch (e) {
+    // Never fail silently: the user would think they're protected while nothing is blocked.
+    console.error('Blocking rule rejected', e);
+    notify("Blocking couldn't start", 'Check the site lists in Settings for typos, then start the session again.');
+  }
 }
 
 async function updateBadge() {
@@ -39,7 +45,7 @@ async function startPhase(phase: Exclude<Phase, 'idle'>) {
 }
 
 function notify(title: string, message: string, id?: string) {
-  const opts: chrome.notifications.NotificationCreateOptions = { type: 'basic', iconUrl: 'icon.png', title, message };
+  const opts: chrome.notifications.NotificationCreateOptions = { type: 'basic', iconUrl: 'icons/icon-128.png', title, message };
   if (id) chrome.notifications.create(id, opts);
   else chrome.notifications.create(opts);
 }
@@ -53,6 +59,25 @@ async function ensureWatchAlarm() {
 }
 
 let checking = false;
+
+/** Reads at most MAX_HTML bytes, so a huge (or endless) response can't exhaust the worker's memory. */
+async function readCapped(res: Response): Promise<string> {
+  const reader = res.body?.getReader();
+  if (!reader) return '';
+  const chunks: Uint8Array[] = [];
+  let size = 0;
+  for (;;) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    chunks.push(value);
+    size += value.length;
+    if (size >= MAX_HTML) { await reader.cancel(); break; }
+  }
+  const all = new Uint8Array(size);
+  let at = 0;
+  for (const c of chunks) { all.set(c, at); at += c.length; }
+  return new TextDecoder().decode(all.subarray(0, MAX_HTML));
+}
 
 /** Checks up to 30 watched postings (oldest first). Saves after each one: progress survives a service-worker
  *  restart, edits made meanwhile aren't overwritten, and the storage calls keep the worker alive. */
@@ -68,12 +93,20 @@ async function checkPostings(): Promise<number> {
       if (i) await new Promise((r) => setTimeout(r, 1000)); // be polite to job boards
       let closed = false;
       let error: string | undefined;
-      try {
-        const res = await fetch(d.url!, { credentials: 'omit', signal: AbortSignal.timeout(15000) });
-        closed = isClosed(res.status, res.ok ? htmlToLines(await res.text()) : []);
-        if (!closed && !res.ok) error = `The page returned HTTP ${res.status}`;
-      } catch {
-        error = "Couldn't load the page";
+      if (!isPublicWebUrl(d.url)) {
+        error = 'Only public job sites are checked'; // never probe localhost, the LAN or IP addresses
+      } else {
+        try {
+          const res = await fetch(d.url!, { credentials: 'omit', referrerPolicy: 'no-referrer', signal: AbortSignal.timeout(15000) });
+          const type = res.headers.get('content-type') ?? '';
+          // A public page that redirected to a local/private address: don't read what came back.
+          const readable = res.ok && isPublicWebUrl(res.url) && /text\/html|application\/xhtml|text\/plain/i.test(type);
+          closed = isClosed(res.status, readable ? htmlToLines(await readCapped(res)) : []);
+          if (!readable) await res.body?.cancel();
+          if (!closed && !res.ok) error = `The page returned HTTP ${res.status}`;
+        } catch {
+          error = "Couldn't load the page";
+        }
       }
       const positions = await get('positions');
       const p = positions.find((x) => x.id === d.id);
@@ -109,7 +142,9 @@ chrome.alarms.onAlarm.addListener(async (alarm) => {
   }
 });
 
-chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
+chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
+  // Only our own pages may drive the timer (there are no content scripts; this is defense in depth).
+  if (sender.id !== chrome.runtime.id || !sender.url?.startsWith(chrome.runtime.getURL(''))) return false;
   const job =
     msg?.type === 'start' ? startPhase('focus')
     : msg?.type === 'stop' ? setTimer(IDLE)
@@ -143,6 +178,7 @@ chrome.runtime.onStartup.addListener(ensureWatchAlarm);
 
 chrome.contextMenus.onClicked.addListener(async (info, tab) => {
   if (info.menuItemId !== 'save-job' || !tab) return;
-  const added = await addJobFromTab(tab);
-  notify(added ? 'Saved to your tracker' : 'Already in your tracker', tab.title || tab.url || '');
+  const result = await addJobFromTab(tab);
+  if (result === 'not-a-page') return notify("This page can't be saved", 'Open a job posting on a website, then try again.');
+  notify(result === 'added' ? 'Saved to your tracker' : 'Already in your tracker', tab.title || tab.url || '');
 });

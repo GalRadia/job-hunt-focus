@@ -39,7 +39,11 @@ A Chrome extension that keeps you focused while job hunting. It blocks distracti
 - `chrome.alarms`, `chrome.storage`, `contextMenus` and `notifications`
 - TypeScript compiled by plain `tsc`, with no bundler and no framework
 - A dependency-free CSV parser and exporter, and regex-based posting checks that run in the MV3 service worker
-- Unit tests with `node:test`, run in CI on GitHub Actions. Each CI run also builds a store-ready `.zip`.
+- Unit tests with `node:test`, plus end-to-end tests with Puppeteer. The end-to-end tests load the real extension into Chrome for Testing and use a local fake internet to cover:
+  - blocking and allowlist redirects
+  - CSV import and posting checks
+  - the security guards: no requests to local-network addresses, hostile pages can't stall the worker, the blocked page can't be framed
+- CI runs both on GitHub Actions and builds a store-ready `.zip`.
 
 Posting checks read the page's HTML without running its JavaScript. Pages that load their content with JavaScript, or block automated requests (LinkedIn often does), show an error in the tracker instead of a wrong status.
 
@@ -49,6 +53,8 @@ Posting checks read the page's HTML without running its JavaScript. Pages that l
 npm install
 npm run build        # or: npm run watch
 npm test             # builds, then runs the unit tests
+npm run e2e:setup    # once: downloads Chrome for Testing into .cache/
+npm run test:e2e     # loads the real extension in Chrome and tests it end to end (offline)
 npm run preview      # UI preview with sample data at http://127.0.0.1:5179/popup.html (?focus, ?break, ?empty)
 ```
 
@@ -61,4 +67,11 @@ To regenerate the store screenshots, keep `npm run preview` running and run `nod
 
 ## Publishing
 
-The store listing text, permission justifications and upload steps are in [store/listing.md](store/listing.md).
+The store package is the `extension/` folder, zipped. Every CI run builds it as an artifact, or build it locally:
+
+```powershell
+npm run build
+Compress-Archive -Path extension\* -DestinationPath job-hunt-focus.zip -Force
+```
+
+Store screenshots and the promo tile are in `store/screenshots/`. Regenerate them with `npm run preview` plus `node tools/screenshots.mjs`. The privacy policy is [PRIVACY.md](PRIVACY.md).

@@ -8,6 +8,17 @@ test('cleanDomain strips protocol, www, path and port', () => {
   assert.equal(cleanDomain('   '), '');
 });
 
+test('cleanDomain: punycode for non-English domains, junk rejected', () => {
+  assert.equal(cleanDomain('https://www.דוגמה.co.il/page'), new URL('http://דוגמה.co.il').hostname);
+  assert.ok(cleanDomain('דוגמה.co.il').startsWith('xn--'));
+  for (const bad of ['a b.com', 'exa_mple.com', '*.evil.com', '..', '"><script>']) {
+    assert.equal(cleanDomain(bad).includes(' ') || /[^a-z0-9.-]/.test(cleanDomain(bad)), false, bad);
+  }
+  assert.equal(cleanDomain('exa_mple.com'), '');
+  assert.equal(cleanDomain('bad domain.com'), '', 'inner spaces reject the entry instead of truncating it');
+  assert.equal(cleanDomain('  youtube.com  '), 'youtube.com');
+});
+
 test('blocklist: one redirect rule with cleaned, de-duplicated domains', () => {
   const [r, ...rest] = buildRules('blocklist', ['youtube.com', 'https://www.youtube.com/', 'reddit.com', '']);
   assert.equal(rest.length, 0);

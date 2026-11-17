@@ -3,11 +3,17 @@
   "name": "Job Hunt Focus",
   "version": "0.2.0",
   "description": "Stay focused while job hunting: site blocker, Pomodoro timer, application tracker with CSV import, daily goals and tab sessions.",
-  "icons": { "128": "icon.png" },
-  "action": { "default_popup": "popup.html", "default_icon": "icon.png" },
+  "icons": { "16": "icons/icon-16.png", "32": "icons/icon-32.png", "48": "icons/icon-48.png", "128": "icons/icon-128.png" },
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": { "16": "icons/icon-16.png", "32": "icons/icon-32.png" }
+  },
   "options_page": "options.html",
   "background": { "service_worker": "js/background.js", "type": "module" },
   "permissions": ["storage", "tabs", "alarms", "declarativeNetRequest", "contextMenus", "notifications"],
   "host_permissions": ["<all_urls>"],
-  "web_accessible_resources": [{ "resources": ["blocked.html"], "matches": ["<all_urls>"] }]
+  "web_accessible_resources": [{ "resources": ["blocked.html"], "matches": ["<all_urls>"] }],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'"
+  }
 }

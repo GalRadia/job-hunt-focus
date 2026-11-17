@@ -49,6 +49,43 @@ test('htmlToLines strips scripts/styles, splits blocks, decodes entities, dedupe
   assert.deepEqual(htmlToLines(html), ['Senior Engineer', 'Tom & Jerry – A', 'Apply now']);
 });
 
+test('htmlToLines: doctype, literal "<" in text, unterminated script hides the rest', () => {
+  assert.deepEqual(htmlToLines('<!DOCTYPE html><?xml x?><p>a < b</p><p>c</p><script>evil'), ['a < b', 'c']);
+  assert.deepEqual(htmlToLines('<P>Upper</P><SCRIPT>x</SCRIPT><Div>Case</Div>'), ['Upper', 'Case']);
+});
+
+test('htmlToLines stays linear on hostile markup (no ReDoS)', () => {
+  const hostile = [
+    '<script'.repeat(200000),
+    '<!--'.repeat(300000),
+    '<p'.repeat(300000) + '>',
+    'x<1'.repeat(300000) + '>',
+    '&' + 'a'.repeat(500000),
+    '<style>' + '</styl'.repeat(200000),
+  ];
+  for (const h of hostile) {
+    const t = performance.now();
+    htmlToLines(h);
+    assert.ok(performance.now() - t < 1000, `slow on ${h.slice(0, 12)}…`);
+  }
+});
+
+test('isPublicWebUrl refuses local, private and credentialed URLs', async () => {
+  const { isPublicWebUrl } = await import('../extension/js/jobs.js');
+  for (const ok of ['https://boards.greenhouse.io/x/jobs/1', 'http://careers.example.com/a']) assert.equal(isPublicWebUrl(ok), true, ok);
+  for (const bad of [
+    'http://localhost:3000/', 'http://127.0.0.1/', 'http://0x7f.1/', 'http://2130706433/', 'http://192.168.1.1/admin',
+    'http://10.0.0.5/', 'http://[::1]/', 'http://[fd00::1]/', 'http://router/', 'http://nas.local/', 'http://app.internal/',
+    'https://user:pass@jobs.example.com/', 'javascript:alert(1)', 'file:///C:/x', '',
+  ]) assert.equal(isPublicWebUrl(bad), false, bad);
+});
+
+test('parseJobTitle stays fast on a hostile title', () => {
+  const t = performance.now();
+  parseJobTitle('a hiring ' + ' in a'.repeat(50000) + ' | ' + 'x'.repeat(50000));
+  assert.ok(performance.now() - t < 200);
+});
+
 test('htmlToLines caps line count and length', () => {
   const lines = htmlToLines(Array.from({ length: 4000 }, (_, i) => `<p>${i}${'x'.repeat(400)}</p>`).join(''));
   assert.equal(lines.length, 3000);

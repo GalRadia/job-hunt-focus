@@ -31,12 +31,15 @@ const shots = {
   }),
 };
 
+const sizes = { 'promo-440x280.png': '440,280' }; // everything else is 1280x800
+shots['promo-440x280.png'] = `${base}/store/promo.html`;
+
 const profile = mkdtempSync(join(tmpdir(), 'jhf-shots-'));
 for (const [file, url] of Object.entries(shots)) {
   const r = spawnSync(chrome, [
     '--headless=new', `--user-data-dir=${profile}`, '--hide-scrollbars', '--force-device-scale-factor=1',
-    '--window-size=1280,800', '--virtual-time-budget=4000', `--screenshot=${join(out, file)}`, url,
-  ], { stdio: 'inherit' });
+    `--window-size=${sizes[file] ?? '1280,800'}`, '--virtual-time-budget=4000', `--screenshot=${join(out, file)}`, url,
+  ], { stdio: ['ignore', 'ignore', 'inherit'] });
   if (r.status !== 0) throw new Error(`chrome failed for ${file}`);
   console.log('wrote', file);
 }

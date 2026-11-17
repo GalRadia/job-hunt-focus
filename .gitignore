@@ -1,3 +1,45 @@
+# ---- Dependencies & build output ----
 node_modules/
 extension/js/
 *.zip
+*.tsbuildinfo
+coverage/
+.cache/
+
+# ---- Secrets: never commit ----
+.env
+.env.*
+# Chrome "Pack extension" private key and package. The .pem signs the extension:
+# anyone holding it can publish updates as you. Keep it backed up somewhere private.
+*.pem
+*.crx
+*.key
+*.p12
+
+# ---- Private notes (local only) ----
+# Chrome Web Store dashboard notes: publisher info, review history, drafts
+CHROMEWEBSTORE.md
+# Security model and residual risks
+SECURITY.md
+# Instructions for the AI coding assistant
+CLAUDE.md
+CLAUDE.local.md
+
+# ---- AI agent tooling (installed locally, not part of the project) ----
+.agents/
+.claude/
+skills-lock.json
+
+# ---- Editors & OS ----
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ---- Logs ----
+*.log
+npm-debug.log*

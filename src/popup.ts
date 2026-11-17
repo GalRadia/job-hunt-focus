@@ -1,5 +1,6 @@
 import { get, set, addTodo, addJobFromTab, toggleTodo, markSeen, removeTodo } from './storage.js';
 import { el, $, formatClock, renderGoal } from './dom.js';
+import { safeUrl } from './jobs.js';
 import { STATUSES, STATUS_LABEL, type Mode, type Todo, type Session, type Timer, type Settings } from './types.js';
 
 const trackerUrl = (q = '') => chrome.runtime.getURL('tracker.html') + q;
@@ -60,8 +61,8 @@ async function renderTodos() {
       return el('li', { className: t.done ? 'done' : '' },
         el('input', { type: 'checkbox', className: 'check', checked: t.done, ariaLabel: t.text, onchange: () => toggleTodo(t.id) }),
         el('div', { className: 'item-stack' },
-          t.url
-            ? el('a', { href: t.url, target: '_blank', textContent: t.text, title: t.text, className: 'item-text' })
+          safeUrl(t.url)
+            ? el('a', { href: safeUrl(t.url)!, target: '_blank', textContent: t.text, title: t.text, className: 'item-text' })
             : el('span', { textContent: t.text, title: t.text, className: 'item-text' }),
           forText ? el('a', { className: 'todo-link', href: trackerUrl(`?open=${encodeURIComponent(p.id)}`), target: '_blank', textContent: forText, title: forText }) : ''),
         el('button', { className: 'del', ariaLabel: `Delete ${t.text}`, textContent: '×', onclick: () => removeTodo(t.id) }),
@@ -106,9 +107,13 @@ async function renderJobs() {
 $('save-job').onclick = async () => {
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
   if (!tab) return;
-  const added = await addJobFromTab(tab);
+  const result = await addJobFromTab(tab);
   const msg = $('save-msg');
-  msg.textContent = added ? 'Saved to your tracker as Saved.' : 'This job is already in your tracker.';
+  msg.textContent = {
+    added: 'Saved to your tracker as Saved.',
+    duplicate: 'This job is already in your tracker.',
+    'not-a-page': 'Open a job posting first, then save it here.',
+  }[result];
   msg.hidden = false;
 };
 $('open-tracker').onclick = () => chrome.tabs.create({ url: trackerUrl() });

@@ -18,7 +18,7 @@ None of this data is sent to the developer or to any other server. The extension
 
 ## Network requests
 
-The only network requests the extension makes are **posting checks**. For positions where you've turned on "Watch", the extension periodically loads that posting's address directly from your browser, without your cookies. It does this to see whether the posting has been taken down. The page is read only to look for closing phrases (such as "no longer accepting applications"), and nothing from it is stored except the result. You can turn this off for any position.
+The only network requests the extension makes are **posting checks**. For positions where you've turned on "Watch", the extension periodically loads that posting's address directly from your browser, without your cookies. It does this to see whether the posting has been taken down. Only public websites are checked, never addresses on your own network, and no referrer is sent. The page is read only to look for closing phrases (such as "no longer accepting applications"), and nothing from it is stored except the result. You can turn this off for any position.
 
 ## Permissions
 

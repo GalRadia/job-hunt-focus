@@ -19,17 +19,18 @@ const stub = `
   const data = qs.has('empty') ? {} : {
     timer: qs.has('focus') ? { phase: 'focus', endsAt: Date.now() + 18 * 60000 + 42000 } : qs.has('break') ? { phase: 'break', endsAt: Date.now() + 3 * 60000 } : { phase: 'idle', endsAt: 0 },
     todos: [
-      { id: '1', text: 'Apply: Senior Frontend Engineer at Wix | LinkedIn', url: 'https://linkedin.com/jobs/1', done: false },
-      { id: '2', text: 'Follow up with recruiter from Monday.com', done: false },
-      { id: '3', text: 'Apply: Full Stack Developer at Check Point', url: 'https://indeed.com/2', done: true, doneAt: Date.now() },
+      // Fictional companies and reserved .example domains: these feed the store screenshots.
+      { id: '1', text: 'Send portfolio link to the Northwind recruiter', done: false },
+      { id: '2', text: 'Follow up with recruiter from Tidewave', done: false },
+      { id: '3', text: 'Write a cover letter for Halcyon Security', done: true, doneAt: Date.now() },
       { id: '4', text: 'Update portfolio README with the extension GIF', done: true, doneAt: Date.now() },
-      { id: '5', text: 'Apply: React Developer at Fiverr', url: 'https://fiverr.com/careers', done: true, doneAt: Date.now() },
+      { id: '5', text: 'Apply to the Copperline React role', url: 'https://jobs.copperline.example/react', done: true, doneAt: Date.now() },
       { id: '6', text: 'Practice React performance questions', done: false, positionId: '1' },
       { id: '7', text: 'Review system design basics', done: true, doneAt: Date.now(), positionId: '1' },
     ],
     sessions: [
-      { id: 'a', name: 'Morning applications', urls: Array(7).fill('https://linkedin.com'), savedAt: Date.now() },
-      { id: 'b', name: 'Interview prep: system design', urls: Array(4).fill('https://github.com'), savedAt: Date.now() },
+      { id: 'a', name: 'Morning applications', urls: Array(7).fill('https://jobs.example'), savedAt: Date.now() },
+      { id: 'b', name: 'Interview prep: system design', urls: Array(4).fill('https://notes.example'), savedAt: Date.now() },
     ],
     history: { [day(0)]: 3, [day(1)]: 5, [day(2)]: 6, [day(3)]: 5, [day(4)]: 5 },
     positions: (() => {
@@ -37,14 +38,14 @@ const stub = `
       const sig = (source, text, ago, unseen = false) => ({ at: now - ago, source, text, unseen });
       const pos = (id, company, title, status, extra = {}) => ({ id, company, title, status, watch: true, signals: [], updatedAt: now - Number(id) * h, ...extra });
       return [
-        pos('1', 'Wix', 'Senior Frontend Engineer', 'interview', { url: 'https://www.wix.com/jobs/1', appliedOn: '2026-11-02', signals: [sig('manual', 'Moved to Interview', 5 * h)], notes: 'Tech interview Thursday 10:00' }),
-        pos('2', 'Lemonade', 'Product Engineer', 'closed', { url: 'https://boards.greenhouse.io/lemonade/1', appliedOn: '2026-10-28', lastChecked: now - h, signals: [sig('page', 'Posting closed', h, true)] }),
-        pos('3', 'Monday.com', 'Full Stack Developer', 'applied', { url: 'https://monday.com/careers/3', appliedOn: '2026-11-10', lastChecked: now - 2 * h }),
-        pos('4', 'Fiverr', 'React Developer', 'applied', { url: 'https://www.linkedin.com/jobs/view/4', appliedOn: '2026-11-12', checkError: 'The page returned HTTP 999' }),
-        pos('5', 'Check Point', 'Software Engineer, Web', 'rejected', { appliedOn: '2026-10-20', signals: [sig('import', 'Imported as Rejected', 30 * h)],
+        pos('1', 'Northwind Labs', 'Senior Frontend Engineer', 'interview', { url: 'https://careers.northwind.example/1', appliedOn: '2026-11-02', signals: [sig('manual', 'Moved to Interview', 5 * h)], notes: 'Tech interview Thursday 10:00' }),
+        pos('2', 'Brightleaf', 'Product Engineer', 'closed', { url: 'https://jobs.brightleaf.example/2', appliedOn: '2026-10-28', lastChecked: now - h, signals: [sig('page', 'Posting closed', h, true)] }),
+        pos('3', 'Tidewave', 'Full Stack Developer', 'applied', { url: 'https://tidewave.example/careers/3', appliedOn: '2026-11-10', lastChecked: now - 2 * h }),
+        pos('4', 'Copperline', 'React Developer', 'applied', { url: 'https://jobs.copperline.example/react', appliedOn: '2026-11-12', checkError: 'The page returned HTTP 403' }),
+        pos('5', 'Halcyon Security', 'Software Engineer, Web', 'rejected', { appliedOn: '2026-10-20', signals: [sig('import', 'Imported as Rejected', 30 * h)],
           reflection: 'Got to the technical round. I rushed the system design question and skipped clarifying requirements.\\nNext time: ask about scale and constraints first, and practice two design problems out loud before the interview.' }),
-        pos('6', 'Riskified', 'Frontend Team Lead', 'offer', { appliedOn: '2026-10-15', signals: [sig('manual', 'Moved to Offer', 20 * h, true)] }),
-        pos('7', 'Similarweb', 'Frontend Engineer', 'saved', { url: 'https://www.similarweb.com/corp/careers/7' }),
+        pos('6', 'Ledgerly', 'Frontend Team Lead', 'offer', { appliedOn: '2026-10-15', signals: [sig('manual', 'Moved to Offer', 20 * h, true)] }),
+        pos('7', 'Orbit Analytics', 'Frontend Engineer', 'saved', { url: 'https://orbit.example/careers/7' }),
       ];
     })(),
   };
@@ -68,7 +69,7 @@ const stub = `
       getURL: (p) => '/' + p,
     },
     tabs: {
-      query: async () => [{ title: 'Product Engineer at Lemonade | LinkedIn', url: 'https://linkedin.com/jobs/9' }, { url: 'chrome://newtab' }],
+      query: async () => [{ title: 'Platform Engineer at Brightleaf | Careers', url: 'https://jobs.brightleaf.example/9' }, { url: 'chrome://newtab' }],
       create: (o) => window.open(o.url, '_blank'),
     },
     windows: { create: (o) => console.log('windows.create', o) },

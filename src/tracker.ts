@@ -1,6 +1,6 @@
 import { get, set, addPosition, updatePosition, markSeen, addTodo, toggleTodo, removeTodo, deletePosition } from './storage.js';
 import { parseCsv, importRows, toCsv } from './csv.js';
-import { newPosition, newSignal, safeUrl, skillTodos } from './jobs.js';
+import { newPosition, newSignal, safeUrl, skillTodos } from './jobs.js'; // safeUrl also guards rendered links
 import { el, $, ago } from './dom.js';
 import { STATUSES, STATUS_LABEL, type Position, type Status, type Todo } from './types.js';
 
@@ -103,7 +103,7 @@ function row(p: Position, mine: Todo[]) {
     el('td', {}, cellInput(p, 'company', 'Company')),
     el('td', {}, el('div', { className: 'role' },
       cellInput(p, 'title', 'Role'),
-      p.url ? el('a', { href: p.url, target: '_blank', rel: 'noreferrer', className: 'open-link', textContent: 'Open posting' }) : '',
+      safeUrl(p.url) ? el('a', { href: safeUrl(p.url)!, target: '_blank', rel: 'noopener noreferrer', className: 'open-link', textContent: 'Open posting' }) : '',
       note ? el('span', { className: `row-note${p.status === 'rejected' && !p.reflection ? ' nudge' : ''}`, textContent: note }) : '')),
     el('td', {}, statusSelect(p)),
     el('td', { className: 'muted', textContent: p.appliedOn ?? '' }),
@@ -265,6 +265,12 @@ $<HTMLInputElement>('import-file').onchange = async (e) => {
   const file = input.files?.[0];
   input.value = ''; // allow picking the same file again
   if (!file) return;
+  if (file.size > 5_000_000) { // storage holds ~10 MB in total; a sheet of applications is far smaller
+    $('import-text').textContent = `${file.name} is larger than 5 MB. Remove unused columns or rows and try again.`;
+    $('import-confirm').hidden = true;
+    $('import-banner').hidden = false;
+    return;
+  }
   pendingRows = parseCsv(await file.text());
   const r = importRows(pendingRows, await get('positions'));
   const rows = Math.max(0, pendingRows.length - 1);
@@ -280,7 +286,13 @@ $('import-cancel').onclick = () => { pendingRows = null; $('import-banner').hidd
 $('import-confirm').onclick = async () => {
   if (!pendingRows) return;
   // Re-run against the latest list so anything that changed since the preview is kept.
-  await set('positions', importRows(pendingRows, await get('positions')).next);
+  try {
+    await set('positions', importRows(pendingRows, await get('positions')).next);
+  } catch {
+    $('import-text').textContent = 'Not enough storage space for this import. Export a backup, delete old positions, then try again.';
+    $('import-confirm').hidden = true;
+    return; // nothing was written; existing data is untouched
+  }
   pendingRows = null;
   $('import-banner').hidden = true;
 };

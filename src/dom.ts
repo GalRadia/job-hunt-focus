@@ -38,7 +38,7 @@ export function renderGoal(history: Record<string, number>, goal: number): void 
   const g = goalSummary(history, goal);
   $('goal-count').textContent = `${g.done} of ${g.goal}`;
   $('pips').replaceChildren(
-    ...Array.from({ length: Math.max(g.goal, g.done) }, (_, i) =>
+    ...Array.from({ length: Math.min(30, Math.max(g.goal, g.done)) }, (_, i) => // capped: a huge goal must not hang the popup
       el('span', { className: i < g.done ? (i < g.goal ? 'pip on' : 'pip extra') : 'pip' })),
   );
   $('pips').setAttribute('aria-label', `${g.done} of ${g.goal} done today`);

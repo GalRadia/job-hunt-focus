@@ -64,9 +64,12 @@ export async function addPosition(p: Position): Promise<boolean> {
   return true;
 }
 
-export async function addJobFromTab(tab: chrome.tabs.Tab): Promise<boolean> {
+/** Saves the tab as a position. Only real web pages: chrome://, file:// and the like aren't job postings. */
+export async function addJobFromTab(tab: chrome.tabs.Tab): Promise<'added' | 'duplicate' | 'not-a-page'> {
+  const url = safeUrl(tab.url);
+  if (!url) return 'not-a-page';
   const { title, company } = parseJobTitle(tab.title || '');
-  return addPosition(newPosition({ title: title || 'Untitled job', company, url: safeUrl(tab.url) }));
+  return (await addPosition(newPosition({ title: title || 'Untitled job', company, url }))) ? 'added' : 'duplicate';
 }
 
 /** Patches a position. Moving to Applied counts toward today's goal. Only status changes bump updatedAt
