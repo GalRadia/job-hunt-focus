@@ -3,7 +3,7 @@ import { cleanDomain } from './rules.js';
 import { $ } from './dom.js';
 
 const lines = (id: string) => [...new Set($<HTMLTextAreaElement>(id).value.split('\n').map(cleanDomain).filter(Boolean))];
-const num = (id: string) => Math.max(1, Math.round(Number($<HTMLInputElement>(id).value)) || 1);
+const num = (id: string, min = 1) => Math.max(min, Math.round(Number($<HTMLInputElement>(id).value)) || min);
 
 async function load() {
   const s = await get('settings');
@@ -12,6 +12,7 @@ async function load() {
   $<HTMLInputElement>('focusMin').value = String(s.focusMin);
   $<HTMLInputElement>('breakMin').value = String(s.breakMin);
   $<HTMLInputElement>('dailyGoal').value = String(s.dailyGoal);
+  $<HTMLInputElement>('watchEveryMin').value = String(s.watchEveryMin);
 }
 
 $<HTMLFormElement>('form').onsubmit = async (e) => {
@@ -24,6 +25,7 @@ $<HTMLFormElement>('form').onsubmit = async (e) => {
     focusMin: num('focusMin'),
     breakMin: num('breakMin'),
     dailyGoal: num('dailyGoal'),
+    watchEveryMin: num('watchEveryMin', 30),
   });
   await load(); // show the cleaned-up domains
   $('saved').hidden = false;

@@ -17,12 +17,13 @@ const shots = {
     title: 'Distractions blocked while you focus',
     text: 'Start a Pomodoro session and the sites that pull you away are blocked until your break.',
   }),
-  '2-goal.png': frame({
-    page: 'popup.html',
-    title: 'Track applications and keep a streak',
-    text: 'Save any job posting as a task in one click, set a daily goal and watch your streak grow.',
+  '5-jobs.png': frame({
+    page: 'popup.html', tab: 'jobs',
+    title: 'Know when a posting closes',
+    text: 'Save any posting in one click. Watched postings are checked in the background, and your daily goal counts every application.',
   }),
   '3-blocked.png': `${base}/blocked.html?focus`,
+  '2-tracker.png': `${base}/tracker.html`,
   '4-sessions.png': frame({
     page: 'popup.html', tab: 'sessions',
     title: 'Pick up exactly where you left off',

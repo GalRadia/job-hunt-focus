@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "Job Hunt Focus",
-  "version": "0.1.0",
-  "description": "Stay focused while job hunting: site blocker, Pomodoro timer, todo list with daily goals, and tab sessions.",
+  "version": "0.2.0",
+  "description": "Stay focused while job hunting: site blocker, Pomodoro timer, application tracker with CSV import, daily goals and tab sessions.",
   "icons": { "128": "icon.png" },
   "action": { "default_popup": "popup.html", "default_icon": "icon.png" },
   "options_page": "options.html",

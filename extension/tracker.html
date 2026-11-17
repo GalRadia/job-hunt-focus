@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Applications | Job Hunt Focus</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="tracker-page">
+  <main class="tracker">
+    <header class="tracker-head">
+      <div>
+        <h1>Applications</h1>
+        <p id="summary" class="muted"></p>
+      </div>
+      <div class="toolbar">
+        <button id="check-now">Check postings now</button>
+        <button id="import-btn">Import CSV</button>
+        <input id="import-file" type="file" accept=".csv,text/csv" hidden>
+        <button id="export">Export CSV</button>
+        <button id="add-toggle" class="primary">Add position</button>
+      </div>
+    </header>
+
+    <form id="add-form" class="add-row" hidden>
+      <input id="add-company" type="text" placeholder="Company" aria-label="Company">
+      <input id="add-title" type="text" placeholder="Role" aria-label="Role" required>
+      <input id="add-url" type="url" placeholder="Posting link (optional)" aria-label="Posting link">
+      <button class="primary">Add</button>
+    </form>
+
+    <div id="import-banner" class="banner" role="status" hidden>
+      <p id="import-text"></p>
+      <div class="banner-actions">
+        <button id="import-cancel">Cancel</button>
+        <button id="import-confirm" class="primary">Import</button>
+      </div>
+    </div>
+
+    <nav id="filters" class="chips" aria-label="Filter by status"></nav>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Company</th><th>Role</th><th>Status</th><th>Applied</th><th>Latest update</th><th title="Check the posting in the background">Watch</th><th><span class="sr-only">Delete</span></th></tr>
+        </thead>
+        <tbody id="rows"></tbody>
+      </table>
+    </div>
+
+    <div id="empty" class="empty-state" hidden>
+      <h2>Track every application in one place</h2>
+      <p>Save jobs from the popup or the right-click menu, add them by hand, or import the spreadsheet you already keep.
+        In Excel, choose File, Save As, and pick CSV. Columns are matched by name, for example:</p>
+      <code>Company, Title, Status, Link, Date, Notes</code>
+    </div>
+  </main>
+  <script type="module" src="js/tracker.js"></script>
+</body>
+</html>

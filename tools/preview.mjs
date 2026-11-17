@@ -30,9 +30,22 @@ const stub = `
       { id: 'b', name: 'Interview prep: system design', urls: Array(4).fill('https://github.com'), savedAt: Date.now() },
     ],
     history: { [day(0)]: 3, [day(1)]: 5, [day(2)]: 6, [day(3)]: 5, [day(4)]: 5 },
+    positions: (() => {
+      const h = 3600000, now = Date.now();
+      const sig = (source, text, ago, unseen = false) => ({ at: now - ago, source, text, unseen });
+      const pos = (id, company, title, status, extra = {}) => ({ id, company, title, status, watch: true, signals: [], updatedAt: now - Number(id) * h, ...extra });
+      return [
+        pos('1', 'Wix', 'Senior Frontend Engineer', 'interview', { url: 'https://www.wix.com/jobs/1', appliedOn: '2026-11-02', signals: [sig('manual', 'Moved to Interview', 5 * h)], notes: 'Tech interview Thursday 10:00' }),
+        pos('2', 'Lemonade', 'Product Engineer', 'closed', { url: 'https://boards.greenhouse.io/lemonade/1', appliedOn: '2026-10-28', lastChecked: now - h, signals: [sig('page', 'Posting closed', h, true)] }),
+        pos('3', 'Monday.com', 'Full Stack Developer', 'applied', { url: 'https://monday.com/careers/3', appliedOn: '2026-11-10', lastChecked: now - 2 * h }),
+        pos('4', 'Fiverr', 'React Developer', 'applied', { url: 'https://www.linkedin.com/jobs/view/4', appliedOn: '2026-11-12', checkError: 'The page returned HTTP 999' }),
+        pos('5', 'Check Point', 'Software Engineer, Web', 'rejected', { appliedOn: '2026-10-20', signals: [sig('import', 'Imported as Rejected', 30 * h)] }),
+        pos('6', 'Riskified', 'Frontend Team Lead', 'offer', { appliedOn: '2026-10-15', signals: [sig('manual', 'Moved to Offer', 20 * h, true)] }),
+        pos('7', 'Similarweb', 'Frontend Engineer', 'saved', { url: 'https://www.similarweb.com/corp/careers/7' }),
+      ];
+    })(),
   };
   const listeners = [];
-  const ev = () => ({ addListener: (f) => listeners.push(f) });
   const fire = (changes) => listeners.forEach((f) => f(changes));
   window.chrome = {
     storage: {
@@ -46,10 +59,15 @@ const stub = `
       sendMessage: async (m) => {
         if (m.type === 'start') await chrome.storage.local.set({ timer: { phase: 'focus', endsAt: Date.now() + 25 * 60000 } });
         if (m.type === 'stop') await chrome.storage.local.set({ timer: { phase: 'idle', endsAt: 0 } });
+        if (m.type === 'check-postings') { await new Promise((r) => setTimeout(r, 800)); return 4; }
       },
       openOptionsPage: () => console.log('openOptionsPage'),
+      getURL: (p) => '/' + p,
     },
-    tabs: { query: async () => [{ title: 'Product Engineer at Lemonade | LinkedIn', url: 'https://linkedin.com/jobs/9' }, { url: 'chrome://newtab' }] },
+    tabs: {
+      query: async () => [{ title: 'Product Engineer at Lemonade | LinkedIn', url: 'https://linkedin.com/jobs/9' }, { url: 'chrome://newtab' }],
+      create: (o) => window.open(o.url, '_blank'),
+    },
     windows: { create: (o) => console.log('windows.create', o) },
   };
 })();

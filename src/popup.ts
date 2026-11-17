@@ -1,6 +1,8 @@
-import { get, set, addTodo, addJobTodo, toggleTodo } from './storage.js';
+import { get, set, addTodo, addJobFromTab, toggleTodo, markSeen } from './storage.js';
 import { el, $, formatClock, renderGoal } from './dom.js';
-import type { Mode, Todo, Session, Timer, Settings } from './types.js';
+import { STATUSES, STATUS_LABEL, type Mode, type Todo, type Session, type Timer, type Settings } from './types.js';
+
+const trackerUrl = (q = '') => chrome.runtime.getURL('tracker.html') + q;
 
 // ---- tabs ----
 const tabs = document.querySelectorAll<HTMLButtonElement>('nav.tabs button');
@@ -69,11 +71,43 @@ $<HTMLFormElement>('todo-form').onsubmit = async (e) => {
   if (input.value.trim()) await addTodo(input.value.trim());
   input.value = '';
 };
+$('clear-done').onclick = async () => set('todos', (await get('todos')).filter((t) => !t.done));
+
+// ---- jobs ----
+async function renderJobs() {
+  const positions = await get('positions');
+  $('status-chips').replaceChildren(
+    ...STATUSES.map((s) => [s, positions.filter((p) => p.status === s).length] as const)
+      .filter(([, n]) => n)
+      .map(([s, n]) => el('a', { className: `chip status-${s}`, href: trackerUrl(`?status=${s}`), target: '_blank' },
+        STATUS_LABEL[s], el('strong', { textContent: ` ${n}` }))),
+  );
+  const updates = positions
+    .flatMap((p) => p.signals.filter((s) => s.unseen).map((s) => ({ p, s })))
+    .sort((a, b) => b.s.at - a.s.at);
+  $('update-count').textContent = updates.length ? String(updates.length) : '';
+  $('update-empty').hidden = updates.length > 0;
+  $('mark-read').hidden = !updates.length;
+  $('update-list').replaceChildren(
+    ...updates.slice(0, 6).map(({ p, s }) =>
+      el('li', {},
+        el('a', { className: 'item-text', href: trackerUrl(), target: '_blank', title: `${p.title} at ${p.company}` },
+          el('strong', { textContent: p.company || p.title }), ` ${s.text}`),
+      ),
+    ),
+  );
+}
+
 $('save-job').onclick = async () => {
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-  if (tab) await addJobTodo(tab);
+  if (!tab) return;
+  const added = await addJobFromTab(tab);
+  const msg = $('save-msg');
+  msg.textContent = added ? 'Saved to your tracker as Saved.' : 'This job is already in your tracker.';
+  msg.hidden = false;
 };
-$('clear-done').onclick = async () => set('todos', (await get('todos')).filter((t) => !t.done));
+$('open-tracker').onclick = () => chrome.tabs.create({ url: trackerUrl() });
+$('mark-read').onclick = () => markSeen();
 
 // ---- sessions ----
 async function renderSessions() {
@@ -103,6 +137,6 @@ $<HTMLFormElement>('session-form').onsubmit = async (e) => {
 };
 
 // ---- render + live updates ----
-const renderAll = () => Promise.all([renderFocus(), renderTodos(), renderSessions()]);
+const renderAll = () => Promise.all([renderFocus(), renderTodos(), renderJobs(), renderSessions()]);
 chrome.storage.onChanged.addListener(renderAll);
 renderAll();

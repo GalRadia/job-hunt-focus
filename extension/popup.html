@@ -37,6 +37,7 @@
 
   <nav class="tabs" role="tablist">
     <button role="tab" data-tab="todos" aria-selected="true">Todos <span id="todo-count" class="count"></span></button>
+    <button role="tab" data-tab="jobs" aria-selected="false">Jobs <span id="update-count" class="count"></span></button>
     <button role="tab" data-tab="sessions" aria-selected="false">Sessions</button>
   </nav>
 
@@ -46,13 +47,24 @@
         <input id="todo-text" type="text" placeholder="Add a task" aria-label="New task" autocomplete="off">
         <button class="primary small-btn">Add</button>
       </form>
+      <ul id="todo-list" class="list"></ul>
+      <p id="todo-empty" class="empty" hidden>Nothing queued. Add a task above.</p>
+      <button id="clear-done" class="link-btn" hidden>Clear finished</button>
+    </section>
+
+    <section id="jobs" class="pane" hidden>
+      <div class="row-between">
+        <button id="open-tracker" class="primary small-btn">Open tracker</button>
+        <button id="mark-read" class="link-btn" hidden>Mark all as read</button>
+      </div>
+      <div id="status-chips" class="chips"></div>
       <button id="save-job" class="wide">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h12v18l-6-4-6 4z"/></svg>
-        Save this tab as a job to apply for
+        Save this tab as a job
       </button>
-      <ul id="todo-list" class="list"></ul>
-      <p id="todo-empty" class="empty" hidden>Nothing queued. Open a job posting and save it here, or add a task above.</p>
-      <button id="clear-done" class="link-btn" hidden>Clear finished</button>
+      <p id="save-msg" class="muted small" role="status" hidden></p>
+      <ul id="update-list" class="list"></ul>
+      <p id="update-empty" class="empty" hidden>No new updates. Closed postings and status changes show up here.</p>
     </section>
 
     <section id="sessions" class="pane" hidden>

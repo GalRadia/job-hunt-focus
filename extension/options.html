@@ -23,6 +23,10 @@
       <label class="field"><span>Break minutes</span><input id="breakMin" type="number" min="1"></label>
       <label class="field"><span>Daily goal</span><input id="dailyGoal" type="number" min="1"></label>
     </div>
+    <label class="field"><span>Check job postings every (minutes)</span>
+      <small>Postings you're watching are checked in the background and marked Closed when they're taken down.</small>
+      <input id="watchEveryMin" type="number" min="30" step="30" style="max-width: 180px">
+    </label>
     <div class="actions">
       <button class="primary">Save settings</button>
       <span id="saved" class="muted" role="status" hidden>Settings saved</span>

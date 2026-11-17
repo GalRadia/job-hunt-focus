@@ -17,6 +17,16 @@ export function minutesLeft(endsAt: number): number {
   return Math.max(0, Math.ceil((endsAt - Date.now()) / 60000));
 }
 
+/** "just now", "5 min ago", "3 h ago", "2 days ago" */
+export function ago(ts: number): string {
+  const m = Math.round((Date.now() - ts) / 60000);
+  if (m < 1) return 'just now';
+  if (m < 60) return `${m} min ago`;
+  if (m < 60 * 24) return `${Math.round(m / 60)} h ago`;
+  const d = Math.round(m / 1440);
+  return `${d} day${d === 1 ? '' : 's'} ago`;
+}
+
 /** ms -> "mm:ss" */
 export function formatClock(ms: number): string {
   const s = Math.max(0, Math.ceil(ms / 1000));
